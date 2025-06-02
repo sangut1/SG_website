@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área Privada | Santos Gutierrez Figueroa</title>
+    
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    
+    <style>
+        .private-area {
+            padding: 8rem 0 5rem;
+        }
+        
+        .nft-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #4285f4;
+            color: white;
+            border-radius: 50px;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        
+        .nft-badge i {
+            margin-right: 0.5rem;
+        }
+        
+        .private-card {
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .private-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .private-card-header {
+            background-color: #4285f4;
+            color: white;
+            padding: 1.5rem;
+        }
+        
+        .private-card-body {
+            padding: 1.5rem;
+        }
+        
+        .document-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+        }
+        
+        .document-item:last-child {
+            border-bottom: none;
+        }
+        
+        .document-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .document-icon {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(66, 133, 244, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+        
+        .document-icon i {
+            color: #4285f4;
+        }
+        
+        .document-info {
+            flex: 1;
+        }
+        
+        .document-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .document-meta {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        
+        .document-actions a {
+            color: #4285f4;
+            margin-left: 1rem;
+            font-size: 1.25rem;
+        }
+        
+        .wallet-info {
+            background-color: #f8f9fa;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .wallet-address {
+            font-family: monospace;
+            background-color: #e9ecef;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            word-break: break-all;
+        }
+        
+        .nft-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .nft-item {
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .nft-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .nft-image {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+        }
+        
+        .nft-details {
+            padding: 1rem;
+        }
+        
+        .nft-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .nft-id {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
+
+    <!-- Header y Navegación -->
+    <header class="header sticky-top" id="header">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">
+                    <img src="images/logo.svg" alt="Santos Gutiérrez" class="img-fluid logo">
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html#home">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html#areas">Áreas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html#about">Acerca de</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html#contact">Contacto</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link connect-wallet connected" href="#" id="walletAddress">
+                                <i class="fas fa-wallet me-1"></i> Conectado
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Private Area Section -->
+    <section class="private-area">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-lg-8 mx-auto text-center">
+                    <div class="nft-badge">
+                        <i class="fas fa-lock-open"></i> Acceso NFT Verificado
+                    </div>
+                    <h1 class="display-4 fw-bold mb-4">Área Privada Exclusiva</h1>
+                    <p class="lead mb-0">Bienvenido al área exclusiva para poseedores de NFT de Santos Gutiérrez Figueroa.</p>
+                </div>
+            </div>
+
+            <div class="row mb-5">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <div class="wallet-info">
+                        <h4 class="mb-3">Información de Wallet</h4>
+                        <p class="mb-2"><strong>Estado:</strong> <span class="text-success">Conectado</span></p>
+                        <p class="mb-2"><strong>Red:</strong> Polygon Mainnet</p>
+                        <p class="mb-2"><strong>Dirección:</strong></p>
+                        <div class="wallet-address mb-3" id="displayWalletAddress">0x1234...5678</div>
+                        <button class="btn btn-sm btn-outline-danger" id="disconnectWallet">
+                            <i class="fas fa-sign-out-alt me-1"></i> Desconectar
+                        </button>
+                    </div>
+
+                    <div class="private-card">
+                        <div class="private-card-header">
+                            <h4 class="mb-0">Tus NFTs</h4>
+                        </div>
+                        <div class="private-card-body">
+                            <div class="nft-gallery" id="nftGallery">
+                                <div class="nft-item">
+                                    <img src="images/nft-preview.jpg" alt="NFT #1234" class="nft-image">
+                                    <div class="nft-details">
+                                        <div class="nft-name">Acceso Premium</div>
+                                        <div class="nft-id">Token ID: #1234</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-8">
+                    <div class="private-card">
+                        <div class="private-card-header">
+                            <h4 class="mb-0">Documentos Exclusivos</h4>
+                        </div>
+                        <div class="private-card-body">
+                            <div class="document-item">
+                                <div class="document-icon">
+                                    <i class="fas fa-file-pdf"></i>
+                                </div>
+                                <div class="document-info">
+                                    <div class="document-title">Guía Legal para Inversores en Criptomonedas</div>
+                                    <div class="document-meta">PDF • 2.4 MB • Actualizado: Mayo 2025</div>
+                                </div>
+                                <div class="document-actions">
+                                    <a href="#" title="Descargar"><i class="fas fa-download"></i></a>
+                                </div>
+                            </div>
+
+                            <div class="document-item">
+                                <div class="document-icon">
+                                    <i class="fas fa-file-word"></i>
+                                </div>
+                                <div class="document-info">
+                                    <div class="document-title">Plantilla de Contrato para Proyectos Blockchain</div>
+                                    <div class="document-meta">DOCX • 1.8 MB • Actualizado: Abril 2025</div>
+                                </div>
+                                <div class="document-actions">
+                                    <a href="#" title="Descargar"><i class="fas fa-download"></i></a>
+                                </div>
+                            </div>
+
+                            <div class="document-item">
+                                <div class="document-icon">
+                                    <i class="fas fa-file-excel"></i>
+                                </div>
+                                <div class="document-info">
+                                    <div class="document-title">Calculadora de Impuestos para Criptoactivos</div>
+                                    <div class="document-meta">XLSX • 3.2 MB • Actualizado: Marzo 2025</div>
+                                </div>
+                                <div class="document-actions">
+                                    <a href="#" title="Descargar"><i class="fas fa-download"></i></a>
+                                </div>
+                            </div>
+
+                            <div class="document-item">
+                                <div class="document-icon">
+                                    <i class="fas fa-file-powerpoint"></i>
+                                </div>
+                                <div class="document-info">
+                                    <div class="document-title">Presentación: Regulación NFT en España 2025</div>
+                                    <div class="document-meta">PPTX • 5.7 MB • Actualizado: Mayo 2025</div>
+                                </div>
+                                <div class="document-actions">
+                                    <a href="#" title="Descargar"><i class="fas fa-download"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="private-card mt-4">
+                        <div class="private-card-header">
+                            <h4 class="mb-0">Consultas Privadas</h4>
+                        </div>
+                        <div class="private-card-body">
+                            <p>Como poseedor de NFT, tienes acceso a consultas privadas con prioridad.</p>
+                            
+                            <form id="private-form">
+                                <div class="mb-3">
+                                    <label for="consultaAsunto" class="form-label">Asunto</label>
+                                    <input type="text" class="form-control" id="consultaAsunto" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="consultaMensaje" class="form-label">Mensaje</label>
+                                    <textarea class="form-control" id="consultaMensaje" rows="4" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i> Enviar Consulta
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer py-5 bg-dark text-white">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-12 text-center">
+                    <div class="social-links">
+                        <a href="https://www.linkedin.com/in/santosgutierrez/" class="social-link" target="_blank"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://twitter.com/santo5_g?lang=es" class="social-link" target="_blank"><i class="fab fa-twitter"></i></a>
+                        <a href="https://api.whatsapp.com/send?phone=34644461166" class="social-link" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://telegram.me/SanGut1" class="social-link" target="_blank"><i class="fab fa-telegram"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="footer-links mb-3">
+                        <a href="index.html">Inicio</a>
+                        <a href="aviso.html">Aviso Legal</a>
+                        <a href="politica.html">Política de Privacidad y Cookies</a>
+                    </div>
+                    <p class="mb-0">
+                        Copyright &copy;<script>document.write(new Date().getFullYear());</script> Todos los derechos reservados | web diseñada <i class="fas fa-heart text-danger"></i> por <a href="https://colorlib.com" target="_blank" class="text-white">Colorlib</a> y actualizada por Manus AI
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Display wallet address from URL or localStorage
+            const params = new URLSearchParams(window.location.search);
+            let walletAddress = params.get('wallet') || localStorage.getItem('walletAddress') || '0x1234...5678';
+            
+            // Format address if it's a full address
+            if (walletAddress.length > 15) {
+                walletAddress = `${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`;
+            }
+            
+            document.getElementById('walletAddress').innerHTML = `<i class="fas fa-wallet me-1"></i> ${walletAddress}`;
+            document.getElementById('displayWalletAddress').textContent = walletAddress;
+            
+            // Handle disconnect button
+            document.getElementById('disconnectWallet').addEventListener('click', function() {
+                localStorage.removeItem('walletAddress');
+                localStorage.removeItem('isConnected');
+                window.location.href = 'index.html';
+            });
+            
+            // Handle private form submission
+            const privateForm = document.getElementById('private-form');
+            if (privateForm) {
+                privateForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Show success message
+                    const formContainer = privateForm.parentElement;
+                    privateForm.style.display = 'none';
+                    
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'alert alert-success';
+                    successMessage.innerHTML = '<i class="fas fa-check-circle me-2"></i> Tu consulta ha sido enviada con éxito. Te responderemos a la mayor brevedad posible.';
+                    
+                    formContainer.appendChild(successMessage);
+                });
+            }
+            
+            // Preloader
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                window.addEventListener('load', function() {
+                    setTimeout(() => {
+                        preloader.style.opacity = '0';
+                        setTimeout(() => {
+                            preloader.style.display = 'none';
+                        }, 500);
+                    }, 500);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+  <style>
+    .logo-text {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+    }
+    .primary {
+      fill: #4285f4;
+    }
+    .secondary {
+      fill: #212529;
+    }
+  </style>
+  <g>
+    <text x="10" y="35" class="logo-text primary" font-size="24">SANTOS</text>
+    <text x="10" y="50" class="logo-text secondary" font-size="16">GUTIÉRREZ</text>
+    <path class="primary" d="M180,15 C186.6,15 192,20.4 192,27 C192,33.6 186.6,39 180,39 C173.4,39 168,33.6 168,27 C168,20.4 173.4,15 180,15 Z M180,18 C175,18 171,22 171,27 C171,32 175,36 180,36 C185,36 189,32 189,27 C189,22 185,18 180,18 Z" />
+    <path class="secondary" d="M180,21 L180,27 L185,30 L183.5,32.5 L177,28.5 L177,21 Z" />
+  </g>
+</svg>
