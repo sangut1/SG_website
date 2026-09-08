@@ -1,6 +1,6 @@
 # ADR-0009 — Pipeline antialucinación bloqueante y umbrales de CI
 
-**Estado:** propuesto
+**Estado:** propuesto; el punto 8 es decisión aceptada de SGF (2026-09-08)
 **Fecha:** 2026-09-08
 **Fase:** 0
 
@@ -37,6 +37,14 @@ literalidad de la cita contra el texto de origen con tres niveles de tolerancia
    `cobertura_grounding`) con umbral configurable y objetivo 0 % / 100 %.
 7. La suite se ejecuta **con modelo local**, para ser reproducible sin salida de
    red y sin coste por ejecución.
+8. **Regla de corpus insuficiente (decisión de SGF, 2026-09-08).** Cuando
+   **ninguna** cita puede resolverse contra fuente —`local-only` con corpus vacío
+   o sin cobertura de la materia—, el sistema **no elabora contenido normativo**:
+   declara la laguna, indica qué corpus o conector le falta, y se detiene. No
+   entrega una respuesta jurídica íntegramente marcada como no verificada, porque
+   el usuario acaba fiándose de lo que tiene delante. El trabajo sobre documentos
+   del propio expediente (análisis, comparación, redacción, revisión) no queda
+   afectado: no depende del corpus.
 
 ## Alternativas consideradas
 
@@ -45,6 +53,9 @@ literalidad de la cita contra el texto de origen con tres niveles de tolerancia
   saber si la cita existe y está vigente. Descartada.
 - **Verificar sólo bajo demanda.** Convierte la verificación en opcional; es el
   fallo que el producto existe para impedir. Descartada.
+- **Responder con todo marcado como no verificado** cuando no hay corpus. Más
+  útil a corto plazo, pero traslada al usuario la carga de desconfiar de cada
+  línea. Descartada por SGF el 2026-09-08.
 
 ## Consecuencias
 
@@ -53,10 +64,15 @@ literalidad de la cita contra el texto de origen con tres niveles de tolerancia
 - Un umbral de 0 % puede bloquear el pipeline con frecuencia al principio. También
   es el comportamiento correcto: la alternativa es publicar un producto que
   inventa citas.
-- Consecuencia límite pendiente de decisión (Q-11): en `local-only` con corpus
-  vacío ninguna cita puede resolverse.
+- Consecuencia límite asumida (Q-11, resuelta): **el modo `local-only` no es
+  utilizable para consulta jurídica hasta que se haya ingerido corpus.** Sí lo es
+  desde el primer día para el trabajo sobre documentos del expediente. Esto eleva
+  la ingesta de corpus de "tarea de la Fase A" a **requisito de puesta en
+  servicio** del modo insignia.
 
 ## Verificación
 
 - La propia suite `evals/` es el criterio de aceptación del producto.
 - Gate de CI que falla al superar los umbrales.
+- Test con corpus vacío que comprueba que el sistema declara la laguna y **no**
+  produce contenido normativo.

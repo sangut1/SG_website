@@ -67,14 +67,14 @@ flowchart TB
         MEXT["Proveedores de modelo externos"]
     end
 
-    KB["Módulo propietario SGF<br/>KB-API v1 · proceso separado<br/>NO AGPL"]
+    KB["Acervo de SGF<br/>plantillas · criterios · prompts<br/>CONTENIDO, no software"]
 
     WEB --> GW
     WORD --> GW
     GW --> ORQ
     ORQ --> RET
     ORQ --> LLM
-    ORQ -.->|opcional| KB
+    KB -->|carga como contenido<br/>por el operador| OBJ
     RET --> IDX
     RET --> PG
     LLM --> OLL
@@ -91,14 +91,16 @@ flowchart TB
     IDX --> PUR
     GW --> OBJ
 
-    classDef prohibido stroke-dasharray: 5 5
-    class EXT,MEXT,FUENTES,KB prohibido
+    classDef externo stroke-dasharray: 5 5
+    class EXT,MEXT,FUENTES,KB externo
 ```
 
 Lo esencial del diagrama: **toda salida de red pasa por `EGR`**, y `EGR` es el
 único punto del sistema autorizado a abrir una conexión saliente. No hay atajos.
-El módulo propietario de SGF queda fuera del árbol AGPL y se comunica por una
-interfaz documentada (`00-licencia-agpl.md`, §3).
+El acervo de SGF (plantillas, criterios de revisión, playbooks, prompts de valor)
+**no es parte del programa**: entra como contenido cargado por el operador, por
+las mismas rutas que un documento de cliente. El árbol AGPL contiene la
+capacidad, vacía de contenido (`00-licencia-agpl.md`, §3; ADR-0001).
 
 ---
 
@@ -539,6 +541,17 @@ resuelta se marca de forma inequívoca como **NO VERIFICADA** o se suprime, seg�
 `politica_citas_no_resueltas` ∈ { `marcar`, `suprimir` }. **Nunca se presenta como
 verificada por defecto**, y no existe valor de configuración que lo permita.
 
+**Regla de corpus insuficiente (decisión de SGF, 2026-09-08).** Cuando **ninguna**
+cita de la respuesta puede resolverse contra fuente —caso típico de `local-only`
+con el corpus vacío o sin cobertura de la materia consultada—, el sistema **no
+elabora contenido normativo**: declara la laguna, indica qué corpus o conector le
+falta, y se detiene. No entrega una respuesta jurídica íntegramente marcada como
+no verificada, porque la experiencia dice que el usuario acaba fiándose de lo que
+tiene delante. Consecuencia asumida y declarada: **el modo `local-only` no es
+utilizable para consulta jurídica hasta que se haya ingerido corpus**; sí lo es
+desde el primer día para el trabajo sobre documentos del propio expediente
+(análisis, comparación, redacción, revisión), que no depende del corpus.
+
 ### 8.2 Marcado en la interfaz
 
 Tres estados visualmente distinguibles, no por color solamente (accesibilidad):
@@ -590,11 +603,12 @@ modelo local para ser reproducible sin salida de red.
 
 ### 9.1 Proveedores
 
-- Por defecto: `<<PROVEEDOR_MODELO_FASE_1>>` — **decisión pendiente de SGF**, véase
-  §12, Q-07. Hasta que se resuelva, el diseño asume **modelo local por defecto**
-  y proveedores externos desactivados.
-- Local: **Ollama** (ya soportado en la base, con detección dinámica de modelos) y
-  **vLLM**.
+- Por defecto: **Ollama en local** (decisión de SGF, 2026-09-08, que resuelve el
+  marcador `<<PROVEEDOR_MODELO_FASE_1>>` del encargo). La base ya lo soporta con
+  detección dinámica de modelos, de modo que es también el camino de menor
+  fricción. Los proveedores externos quedan **desactivados de fábrica**.
+- Local: **Ollama** (por defecto) y **vLLM** (alternativa para despliegues con GPU
+  y concurrencia alta).
 - Externos: opción explícita, por tenant, desactivable, con `kill switch`.
 
 ### 9.2 Enrutado por sensibilidad — **control técnico, no recomendación** (ADR-0010)
@@ -759,7 +773,7 @@ Modelo de permisos con:
 
 | ADR | Decisión |
 | --- | --- |
-| [ADR-0001](adr/0001-fork-y-separacion-del-modulo-propietario.md) | Fork monorepo y separación del módulo propietario por proceso e interfaz HTTP |
+| [ADR-0001](adr/0001-fork-y-separacion-del-modulo-propietario.md) | Fork monorepo en repositorio dedicado; *know-how* de SGF como contenido, no como software |
 | [ADR-0002](adr/0002-cliente-http-unico-y-lista-blanca-de-egreso.md) | Cliente HTTP único con lista blanca de egreso y triple aplicación forzosa |
 | [ADR-0003](adr/0003-cifrado-en-reposo-y-jerarquia-de-claves.md) | Cifrado en reposo con jerarquía de claves del operador |
 | [ADR-0004](adr/0004-multi-tenancy-y-aislamiento.md) | Multi-tenancy con aislamiento por fila y por *bucket* |
@@ -778,15 +792,23 @@ Modelo de permisos con:
 
 Las de licencia (Q-01 a Q-06) están en `00-licencia-agpl.md`, §7. Además:
 
+### 12.1 Resueltas por SGF el 2026-09-08
+
+| # | Cuestión | Decisión |
+| --- | --- | --- |
+| Q-02 | Frontera con el *know-how* de SGF | **Contenido cargado por el operador**; el acervo no es software y queda fuera del árbol AGPL. Véase `00-licencia-agpl.md` §3 y ADR-0001 |
+| Q-07 | `<<PROVEEDOR_MODELO_FASE_1>>` | **Ollama en local.** Proveedores externos desactivados de fábrica. Véase §9.1 y ADR-0010 |
+| Q-11 | Corpus vacío en `local-only` | **Negarse y declarar la laguna.** El sistema no elabora contenido normativo sin corpus que lo sostenga. Véase §8.1 y ADR-0009 |
+| Q-13 | Repositorio del fork | **Fase 0 en `sangut1/SG_website`; el código, en repositorio nuevo** al aprobar la Fase 1 |
+
+### 12.2 Pendientes
+
 | # | Cuestión | Por qué no la decido yo |
 | --- | --- | --- |
-| Q-07 | **`<<PROVEEDOR_MODELO_FASE_1>>` sigue sin resolver** en el encargo. ¿Cuál es el proveedor de modelo por defecto de la Fase 1? | Es un marcador literal sin valor. Condiciona §9, la suite `evals/` y la prueba de red aislada |
 | Q-08 | Calificación de SGF como *proveedor* y/o *responsable del despliegue* a efectos del Reglamento (UE) 2024/1689 | Calificación jurídica con consecuencias de cumplimiento. Corresponde a SGF |
 | Q-09 | ¿La regla de modelo local se limita al art. 10 RGPD o cubre también el art. 9? Propuesta: ambos | Decisión de política de riesgo del despacho |
 | Q-10 | Política por defecto de citas no resueltas: `marcar` o `suprimir` | Decisión de producto con efectos de responsabilidad profesional |
-| Q-11 | En `local-only` con corpus vacío, **ninguna** cita puede resolverse. ¿El sistema se niega a responder cuestiones jurídicas, o responde marcando todo como no verificado? | Consecuencia lógica del Requisito 4 llevada al límite. Afecta a la usabilidad del modo insignia |
 | Q-12 | Alcance jurisdiccional de la Fase 1: ¿España + UE? ¿Qué comunidades autónomas y qué supervisores entran primero? | Determina el orden de los conectores de Fase A |
-| Q-13 | Dónde vive el repositorio del fork. Este repositorio (`sangut1/SG_website`) es el sitio web estático de santosgutierrez.com; no parece su sitio | Afecta a `CLAUDE.md`/`AGENTS.md`, a `CODEOWNERS` y al cumplimiento de la sec. 13 AGPL |
 | Q-14 | Corpus etiquetado de escritos reales para validar el parser de citas (§6.2) | Requiere material de SGF y **no puede vivir en el árbol AGPL** |
 | Q-15 | ¿Se mantiene el complemento de Word en la Fase 1? Arrastra dependencias de fuentes remotas y una superficie de despliegue adicional | Decisión de alcance de producto |
 

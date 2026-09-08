@@ -23,7 +23,11 @@ un proveedor externo (`DEFAULT_MAIN_MODEL = "gemini-3-flash-preview"`).
 4. **Sin recurso automático**: si no hay modelo local disponible y el contexto es
    sensible, la operación **falla** con mensaje claro. Nunca se recurre a un
    proveedor externo.
-5. Modelo local por defecto; proveedores externos desactivados de fábrica y
+5. **Modelo local por defecto: Ollama** (decisión de SGF, 2026-09-08, que resuelve
+   el marcador `<<PROVEEDOR_MODELO_FASE_1>>` del encargo). La base ya lo soporta
+   con detección dinámica de modelos, de modo que es también el camino de menor
+   fricción. **vLLM** queda como alternativa para despliegues con GPU y
+   concurrencia alta. Los proveedores externos están **desactivados de fábrica** y
    sujetos al `kill switch` por tenant (ADR-0004).
 
 ## Fundamento normativo verificado
@@ -51,7 +55,12 @@ un proveedor externo (`DEFAULT_MAIN_MODEL = "gemini-3-flash-preview"`).
 
 - Calidad de respuesta menor en expedientes sensibles, limitada por el modelo
   local disponible. Es el intercambio que el producto vende.
-- Obliga a que el despliegue mínimo viable incluya un modelo local operativo.
+- Obliga a que el despliegue mínimo viable incluya un modelo local operativo:
+  Ollama pasa a ser **dependencia de puesta en servicio**, no accesorio. La suite
+  `evals/` y la prueba de red aislada se ejecutan contra él.
+- Fija el listón de calidad de la Fase 1 en lo que rinda el modelo local elegido.
+  La elección del modelo concreto que corre sobre Ollama es una decisión separada
+  y revisable, guiada por la suite `evals/`.
 
 ## Verificación
 

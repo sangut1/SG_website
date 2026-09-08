@@ -198,7 +198,11 @@ eso la sección 13 existe como obligación autónoma.
 
 ---
 
-## 3. Frontera entre código derivado (AGPL) y módulo propietario de SGF
+## 3. Frontera entre código derivado (AGPL) y *know-how* de SGF
+
+> **DECISIÓN DE SGF, 2026-09-08.** Se adopta la **vía de contenido cargado por el
+> operador** (antes descrita como alternativa 3.4). Se descarta, por ahora, la
+> arquitectura de módulo-servicio propietario. Véase ADR-0001.
 
 ### 3.1 El problema
 
@@ -209,56 +213,63 @@ sección 5 c) —*"You must license the entire work, as a whole, under this
 License"*— y habría que publicarlo bajo AGPL a todo el que reciba una copia y,
 por la sección 13, a todo usuario remoto.
 
-### 3.2 Arquitectura de separación propuesta
+### 3.2 Solución adoptada: el *know-how* no es software
+
+El material de valor de SGF **no se incorpora al programa en ninguna forma**. Es
+**contenido**, y entra en el sistema por las mismas rutas por las que entra
+cualquier documento de un cliente:
 
 ```
-┌──────────────────────────────────────────┐        ┌──────────────────────────────────┐
-│  NÚCLEO (AGPL-3.0)                       │        │  MÓDULO PROPIETARIO SGF          │
-│  repositorio: fork público               │        │  repositorio: privado, separado  │
-│                                          │        │                                  │
-│  · backend Express                       │        │  · plantillas contractuales      │
-│  · frontend Next.js                      │  HTTP  │  · criterios de revisión         │
-│  · modelo de fuentes y preceptos         │ ─────► │  · prompts de valor              │
-│  · pipeline antialucinación              │  mTLS  │  · playbooks de negociación      │
-│  · conectores a fuentes públicas         │ ◄───── │                                  │
-│  · cliente de la interfaz KB-API         │  JSON  │  · implementa KB-API v1          │
-│    (sin implementación por defecto)      │        │                                  │
-└──────────────────────────────────────────┘        └──────────────────────────────────┘
-        proceso A, contenedor A                            proceso B, contenedor B
-        binario público                                    binario privado
-        no importa nada del módulo B                       no importa nada del núcleo
+┌───────────────────────────────────────────────────────────┐
+│  FORK (AGPL-3.0) — repositorio público                    │
+│                                                           │
+│  · backend · frontend · modelo de fuentes y preceptos     │
+│  · pipeline antialucinación · conectores                  │
+│  · biblioteca de plantillas, playbooks y criterios:       │
+│    LA FUNCIONALIDAD, VACÍA DE CONTENIDO                   │
+└───────────────────────────────────────────────────────────┘
+                            ▲
+                            │  carga en tiempo de ejecución
+                            │  (subida de documentos, filas de BD,
+                            │   ficheros de configuración del operador)
+                            │
+┌───────────────────────────────────────────────────────────┐
+│  ACERVO DE SGF — fuera del árbol de código                │
+│  plantillas · criterios de revisión · playbooks · prompts │
+│  Custodia, versionado y respaldo por procedimiento propio │
+└───────────────────────────────────────────────────────────┘
 ```
 
-**Reglas técnicas que hacen defendible la separación:**
+**Reglas de la separación:**
 
-1. **Procesos y contenedores distintos.** Nunca el mismo proceso, nunca carga
-   dinámica de un plugin propietario dentro del proceso del núcleo, nunca
-   *linking* en el sentido clásico.
-2. **Interfaz genérica y documentada públicamente.** Se define `KB-API v1` como
-   contrato HTTP/JSON (OpenAPI en el repositorio público). Debe ser una interfaz
-   de propósito general —"dame documentos de conocimiento que apliquen a este
-   contexto"— y no una interfaz diseñada a medida de un único módulo. Una
-   interfaz genérica con varias implementaciones posibles (incluida una de
-   ejemplo, AGPL, con datos ficticios) refuerza la tesis de agregación.
-3. **El núcleo se ejecuta y es útil sin el módulo.** Si `KB_API_URL` no está
-   configurada, el núcleo funciona completo, sin degradación silenciosa y sin
-   mensajes que induzcan a pensar que falta un componente obligatorio. Un núcleo
-   inservible sin el módulo es el mejor argumento de la parte contraria para
-   sostener que forman una única obra.
-4. **Contenido, no lógica.** El módulo propietario devuelve **datos** (texto de
-   plantillas, criterios, prompts como cadenas) que el núcleo trata como
-   contenido de entrada, igual que trata un documento subido por el usuario. No
-   devuelve código ejecutable ni instrucciones de control de flujo del núcleo.
-5. **Sin dependencias cruzadas en el código.** El repositorio público no importa,
-   no referencia por nombre, no contiene fixtures ni tests del módulo privado. El
-   repositorio privado puede depender del contrato público, no al revés.
-6. **Verificación en CI.** Un *gate* del pipeline público falla si aparece en el
-   árbol cualquier referencia a los espacios de nombres del módulo privado
-   (véase apartado 5).
+1. El repositorio contiene la **capacidad** (una biblioteca de plantillas, un
+   motor de listas de comprobación, un campo donde se pega un prompt), **nunca el
+   contenido**. Es la diferencia entre publicar un procesador de textos y publicar
+   los contratos escritos con él.
+2. Ningún *seed*, *fixture*, test, ejemplo de documentación ni valor por defecto
+   contiene material real de SGF. Los datos de ejemplo son **ficticios y lo
+   declaran**.
+3. Los prompts de valor competitivo se cargan como **datos de configuración del
+   tenant**, no como constantes del código. El repositorio incluye prompts base
+   genéricos, publicables sin reservas; los de SGF viven en la configuración del
+   despliegue.
+4. El acervo se custodia fuera del repositorio, con su propio versionado,
+   respaldo y control de acceso, y con procedimiento documentado de carga.
 
-### 3.3 Advertencia expresa: esto es una zona gris
+**Fundamento:** el contenido que un usuario introduce en un programa AGPL no se
+convierte en obra derivada del programa. La AGPL alcanza al software, no a los
+documentos que se procesan con él. Esta vía **no tiene zona gris**.
 
-**Debe leerse literalmente y no matizarse en la comunicación con clientes:**
+### 3.3 Lo que se renuncia con esta decisión, y la zona gris que se evita
+
+**Se renuncia a** lógica propietaria: no puede haber algoritmos, reglas de
+decisión ni flujos exclusivos de SGF que no estén publicados bajo AGPL. Todo lo
+que sea *programa* es público. Si en el futuro el producto necesitara lógica
+propietaria, habría que reabrir esta decisión y asumir el riesgo descrito a
+continuación.
+
+**Se evita** la zona gris. Se conserva aquí la advertencia, porque sigue siendo
+la razón por la que esta decisión es la prudente:
 
 > La distinción entre **obra derivada** (que la sección 5 c) obliga a licenciar
 > íntegramente bajo AGPL) y **mera agregación** (*"aggregate"*, párrafo final de
@@ -273,34 +284,24 @@ por la sección 13, a todo usuario remoto.
 > alcance en el escenario de dos procesos que se comunican por HTTP.
 >
 > La postura de la Free Software Foundation (autora de la licencia) sobre
-> comunicación entre procesos y su valor interpretativo **no es Derecho
-> aplicable**: es la opinión del licenciante, relevante como criterio de
-> interpretación de la voluntad de las partes, no como norma.
+> comunicación entre procesos **no es Derecho aplicable**: es la opinión del
+> licenciante, relevante como criterio de interpretación de la voluntad de las
+> partes, no como norma.
 > `[PENDIENTE DE VERIFICACIÓN: contrastar el texto actual del FAQ oficial de la
 > FSF sobre GPL/AGPL y separación por procesos antes de citarlo en ningún
 > documento del proyecto.]`
->
-> **Consecuencia operativa:** la arquitectura del apartado 3.2 reduce el riesgo,
-> no lo elimina. Cualquier compromiso contractual de SGF frente a un cliente que
-> afirme categóricamente que el módulo propietario "no está sujeto a AGPL" debe
-> ser revisado por SGF como decisión jurídica propia, y no apoyarse en este
-> documento técnico como si fuera un dictamen.
 
-### 3.4 La alternativa que elimina el riesgo
+Una arquitectura de módulo-servicio separado por procesos e interfaz HTTP
+—repositorio privado, contenedor distinto, contrato genérico documentado en el
+repositorio público, núcleo plenamente funcional sin el módulo, intercambio de
+datos y no de código— **reduciría** ese riesgo sin eliminarlo. Queda descrita
+aquí y en ADR-0001 por si SGF decide reabrirla; **no se implementa**.
 
-Si SGF prefiere riesgo cero en lugar de riesgo reducido, la vía limpia es que el
-*know-how* **no sea software**: que viva como contenido cargado en tiempo de
-ejecución por el operador (documentos, ficheros de configuración, entradas de
-base de datos) a través de las mismas rutas por las que entra cualquier documento
-de cliente. El contenido que el usuario introduce en un programa AGPL no se
-convierte en obra derivada del programa. Esta vía es más pobre funcionalmente
-(no permite lógica propietaria) pero es incontestable.
+### 3.4 Consecuencia para la comunicación comercial
 
-**Decisión pendiente de SGF:** módulo-servicio (3.2, riesgo reducido) frente a
-contenido-cargado (3.4, riesgo nulo, menos capacidad). Puede empezarse por 3.4 y
-migrar a 3.2 más adelante.
-
----
+Con esta decisión, SGF puede afirmar sin matices que su acervo documental no está
+sujeto a la AGPL, porque no es software. Lo que **no** puede afirmar es que la
+plataforma contenga funcionalidad propietaria: no la contiene, por diseño.
 
 ## 4. Checklist de rebranding
 
@@ -411,10 +412,18 @@ revisión de licencia**, conforme a las convenciones de trabajo del proyecto.
 
 ## 7. Riesgos abiertos y decisiones que requieren pronunciamiento de SGF
 
+### 7.1 Resueltas por SGF el 2026-09-08
+
+| # | Cuestión | Decisión |
+| --- | --- | --- |
+| Q-02 | Frontera con el *know-how* de SGF | **Contenido cargado por el operador.** El acervo de SGF no es software y queda fuera del árbol AGPL. Se descarta el módulo-servicio propietario. Véase §3 y ADR-0001 |
+| Q-13 | Dónde vive el repositorio del fork | **Fase 0 aquí (`sangut1/SG_website`), código en repositorio nuevo.** Estos documentos permanecen como memoria del proyecto; el fork se crea en un repositorio dedicado al aprobar la Fase 1 |
+
+### 7.2 Pendientes
+
 | # | Cuestión | Por qué no la resuelvo yo |
 | --- | --- | --- |
 | Q-01 | Nombre y marca del fork | Decisión comercial de SGF; condiciona R-01 a R-07 |
-| Q-02 | ¿Módulo-servicio (3.2) o contenido-cargado (3.4)? | Determina el perfil de riesgo AGPL asumido |
 | Q-03 | ¿Habrá distribución del software a terceros (instaladores, imágenes) o sólo despliegue operado por SGF? | Cambia el peso relativo de las secs. 4/5 frente a la sec. 13 |
 | Q-04 | ¿Se implementan Appropriate Legal Notices pese a la dispensa de la sec. 5 d)? | Propuesta: sí. Requiere confirmación |
 | Q-05 | Ámbito de la oferta de código de la sec. 13 en `local-only` monopuesto | Propuesta: ofrecerlo siempre. Requiere confirmación |
