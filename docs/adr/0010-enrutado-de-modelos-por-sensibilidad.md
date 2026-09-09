@@ -1,6 +1,6 @@
 # ADR-0010 — Enrutado de modelos por sensibilidad como control técnico
 
-**Estado:** propuesto
+**Estado:** propuesto; alcance fijado por SGF el 2026-09-09
 **Fecha:** 2026-09-08
 **Fase:** 0
 
@@ -14,9 +14,11 @@ un proveedor externo (`DEFAULT_MAIN_MODEL = "gemini-3-flash-preview"`).
 
 ## Decisión
 
-1. Clasificación por expediente y documento: `secreto_profesional`, `rgpd_art_9`,
-   `rgpd_art_10`, `ordinario`.
-2. Las tres primeras clases **sólo** pueden procesarse con modelo local.
+1. Clasificación por expediente y documento: `secreto_profesional`,
+   `rgpd_art_10`, `rgpd_art_9`, `ordinario`.
+2. **`secreto_profesional` y `rgpd_art_10` sólo pueden procesarse con modelo
+   local** (decisión de SGF, 2026-09-09). `rgpd_art_9` se implementa como clase
+   **opcional, desactivada por defecto**, activable por quien despliegue GNEO.
 3. **El control vive en el router de modelos**, se aplica sobre la unión de todos
    los documentos aportados al contexto y **antes** de construir la petición. Es
    una excepción que impide la llamada, no un aviso.
@@ -38,8 +40,14 @@ un proveedor externo (`DEFAULT_MAIN_MODEL = "gemini-3-flash-preview"`).
   a identificar unívocamente, salud, vida sexual u orientación sexual—.
 - **Art. 10 RGPD**: datos relativos a **condenas e infracciones penales** o
   medidas de seguridad conexas.
-- El encargo menciona el art. 10; el diseño cubre **art. 9 y art. 10**, porque un
-  despacho generalista trata ambos. Sometido a confirmación de SGF (Q-09).
+- SGF ha decidido (2026-09-09) **limitar la regla obligatoria al art. 10** y al
+  secreto profesional. Consecuencia asumida: un expediente de laboral, familia o
+  daños personales con datos de salud no queda cubierto por la regla obligatoria.
+  El riesgo es hoy teórico —los proveedores externos están desactivados de fábrica
+  y SGF opera sólo con modelo local— y se materializaría al activar un proveedor
+  externo o al desplegar GNEO un tercero con esa configuración. Por eso la clase
+  `rgpd_art_9` se implementa y se deja a un interruptor de distancia en lugar de
+  eliminarla.
 
 ## Alternativas consideradas
 
@@ -64,7 +72,8 @@ un proveedor externo (`DEFAULT_MAIN_MODEL = "gemini-3-flash-preview"`).
 
 ## Verificación
 
-- Test que, con un documento marcado `rgpd_art_9` en el contexto, comprueba que
-  el cliente de egreso **no recibe ninguna llamada**.
+- Test que, con un documento marcado `rgpd_art_10` en el contexto, comprueba que
+  el cliente de egreso **no recibe ninguna llamada**; y el mismo test para
+  `rgpd_art_9` con la clase activada.
 - Test que comprueba que la indisponibilidad del modelo local produce error y no
   recurso a proveedor externo.

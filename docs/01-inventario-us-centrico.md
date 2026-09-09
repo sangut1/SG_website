@@ -1,7 +1,8 @@
 # 01 — Inventario de componentes con supuestos de Derecho anglosajón
 
 **Estado:** borrador para aprobación (Fase 0).
-**Fecha:** 2026-09-08.
+**Fecha:** 2026-09-08, revisado el 2026-09-09.
+**Fork:** **GNEO** (nombre provisional).
 **Base analizada:** `Open-Legal-Products/mike`, commit
 `8b3466fc04bf8cad623238a71fca1fda3fc89fde` (2026-09-05), clonado y leído
 íntegramente para este inventario.
@@ -101,7 +102,7 @@ prompts** y en las descripciones de herramientas que se envían al modelo.
 | I-22 | Ausencia de índice vectorial y de *chunking* | Verificado por ausencia de `pgvector`/`embedding`; `backend/src/lib/search.ts` sólo normaliza términos de búsqueda | La recuperación es "mete el documento entero en el contexto" | **CONSTRUIR DE CERO**: recuperación híbrida a nivel de precepto, filtrada por vigencia a `as_of` |
 | I-23 | Sin multi-tenancy real: el aislamiento es por `user_id` y por listas de compartición | `project_access_grants`, `chat_access_grants`, `workflow_shares`, `project_org_access_overrides`; 30 políticas RLS en el esquema | Un despacho = un conjunto de usuarios que comparten, no un tenant | **SUSTITUIR** por tenant de primer nivel con RLS por fila y prefijo de *bucket* por tenant (Requisito 1) |
 | I-24 | Borrado lógico (*soft delete*) de versiones de documento | `backend/schema.sql:733,752`; migración `20260610_01_soft_deleted_document_versions.sql`; `docs/tamper-evident-exports.md` documenta que las versiones borradas **permanecen en el manifiesto** | Retención por defecto | **SUSTITUIR** por purga real con mapa de propagación (Requisito 1). Atención al conflicto declarado entre borrado y cadena de auditoría: se resuelve en doc. 02, §9 |
-| I-25 | Taxonomía de jurisdicciones como lista de países + estados de EE. UU. | `frontend/src/app/components/workflows/NewWorkflowModal.tsx:84-88` (`JURISDICTION_OPTIONS`, `US_STATE_OPTIONS` con los 50 estados); `user_profiles.jurisdiction` como texto libre validado contra esa lista | Modelo federal EE. UU.; el resto del mundo es "un país" | **SUSTITUIR** por jerarquía territorial europea: UE → Estado miembro → comunidad autónoma → entidad local |
+| I-25 | Taxonomía de jurisdicciones como lista de países + estados de EE. UU. | `frontend/src/app/components/workflows/NewWorkflowModal.tsx:84-88` (`JURISDICTION_OPTIONS`, `US_STATE_OPTIONS` con los 50 estados); `user_profiles.jurisdiction` como texto libre validado contra esa lista | Modelo federal EE. UU.; el resto del mundo es "un país" | **SUSTITUIR** por la jerarquía territorial declarada en el **perfil de jurisdicción** (ADR-0013). Perfil `ES`/`EU` de la Fase 1: UE → Estado miembro → comunidad autónoma → entidad local. No se cablea: con la ampliación prevista a Iberoamérica, la lista debe ser dato |
 | I-26 | Perfil de usuario con `professional_title` de tradición anglosajona (`Partner`, `Senior Associate`, `Associate`, `Law Clerk`, `Counsel`, `General Counsel`) | `backend/schema.sql:25-36` | Estructura de *law firm* anglosajona | **SUSTITUIR** por nomenclatura española/UE (abogado ejerciente, socio, of counsel, pasante, asesor jurídico interno…) — decisión de SGF |
 | I-27 | `practice_setting` (`private_practice`, `in_house`, `not_practising`) | `backend/schema.sql:19-23` | Neutro | **CONSERVAR** |
 
@@ -114,7 +115,7 @@ prompts** y en las descripciones de herramientas que se envían al modelo.
 | I-28 | Formato de fecha cableado a `en-US` | `frontend/src/app/components/assistant/DocPanel.tsx:384` (`new Intl.DateTimeFormat("en-US", …)`) | **SUSTITUIR** por configuración regional del tenant (por defecto `es-ES`) |
 | I-29 | Formato de importe cableado a `en-US` | `frontend/src/app/components/settings/RouterSettingsSection.tsx:22` (`new Intl.NumberFormat("en-US", …)`) | **SUSTITUIR** (separador decimal coma, símbolo €) |
 | I-30 | Resto de fechas con configuración regional del navegador (`toLocaleDateString(undefined, …)`) | `FileDirectory.tsx:104`, `ProjectsOverview.tsx:71`, `ProjectPageParts.tsx:50`, `WorkflowAssets.tsx:60`, `OrganizationsOverview.tsx:51`, `OrganizationWorkspace.tsx:99`, `history/page.tsx:133`, `tabular-reviews/page.tsx:77`, `word-addin/.../ChatHistoryList.tsx:40` | **ABSTRAER**: la configuración regional debe ser del **tenant**, no del navegador. Una fecha jurídica no puede depender de la configuración del equipo desde el que se consulta |
-| I-31 | Interfaz y prompts íntegramente en inglés; sin infraestructura de i18n | Todo `frontend/src`, `word-addin/src`, `backend/src/lib/chat/` | **SUSTITUIR**: i18n de primera clase, español como idioma principal. Requisito reforzado por el multilingüismo UE (Requisito 2.3) |
+| I-31 | Interfaz y prompts íntegramente en inglés; sin infraestructura de i18n | Todo `frontend/src`, `word-addin/src`, `backend/src/lib/chat/` | **SUSTITUIR**: i18n de primera clase con **paquetes de idioma intercambiables** desde el primer commit (ADR-0013), `es-ES` como paquete base. Tres ejes independientes: idioma de interfaz, de prompts y de la manifestación normativa. Reforzado por el multilingüismo UE (Requisito 2.3) y por la ampliación prevista a Iberoamérica. Incluye el complemento de Word, que **se mantiene** en la Fase 1 |
 | I-32 | `lang="en-US"` en generación de documentos ofimáticos | `backend/src/lib/chat/tools/documentOps.ts:810` | **SUSTITUIR** por el idioma del documento |
 | I-33 | Normalización de texto pensada para el inglés (`"U.S." → "us"`, `"plaintiff's" → "plaintiffs"`) | `backend/src/lib/chat/tools/documentOps.ts:1744,1779` | **SUSTITUIR** por normalización sensible al español (tildes, `ñ`, abreviaturas jurídicas: `art.`, `núm.`, `Excmo.`, `LOPJ`) |
 
@@ -213,4 +214,10 @@ ficheros.
    recuperación con la vigencia temporal como filtro de primer nivel, en vez de
    añadirla a posteriori sobre un índice plano.
 4. Los hallazgos S-01 a S-05 deben resolverse **antes** de la primera prueba de
-   red aislada, o esa prueba no arrancará.
+   red aislada, o esa prueba no arrancará. S-01 (fuentes remotas de Google en el
+   complemento de Word) sigue en alcance: SGF ha decidido **mantener el
+   complemento** en la Fase 1.
+5. La decisión de ampliar a Iberoamérica (2026-09-09) sube de categoría los
+   hallazgos I-25, I-28 a I-33: dejan de ser localización y pasan a ser
+   **arquitectura**. Un `enum` de jurisdicciones o una cadena en línea que se
+   cuelen ahora se pagan con una migración después (ADR-0013).

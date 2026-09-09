@@ -1,9 +1,10 @@
-# 02 — Arquitectura objetivo
+# 02 — Arquitectura objetivo de GNEO
 
 **Estado:** borrador para aprobación (Fase 0).
-**Fecha:** 2026-09-08.
+**Fecha:** 2026-09-08, revisado el 2026-09-09.
+**Nombre provisional del fork:** **GNEO** (decisión de SGF, 2026-09-09).
 **Documentos previos:** `00-licencia-agpl.md`, `01-inventario-us-centrico.md`.
-**Decisiones formalizadas:** `docs/adr/` (ADR-0001 a ADR-0012).
+**Decisiones formalizadas:** `docs/adr/` (ADR-0001 a ADR-0013).
 
 ---
 
@@ -187,21 +188,37 @@ No es una lista plana de documentos. Entidades de primer nivel:
 
 ```
 Instrumento (norma)
- ├── identificador canónico: ELI
- ├── nivel: supranacional | nacional | autonómico | local
- ├── tipo: tratado | reglamento_ue | directiva | decision | reglamento_delegado |
- │         reglamento_ejecucion | soft_law_ue |
- │         constitucion | ley_organica | ley_ordinaria | real_decreto_ley |
- │         real_decreto_legislativo | real_decreto | orden_ministerial |
- │         circular_supervisor | ...
- ├── rango: entero derivado del tipo y del nivel (para el conflicto jerárquico)
+ ├── identificador canónico (esquema por jurisdicción; ELI en la UE)
+ ├── jurisdicción: ES | EU | … (extensible)
+ ├── nivel: referencia a la tabla de niveles de SU jurisdicción
+ ├── tipo: referencia a la tipología de SU jurisdicción
+ ├── rango: entero, derivado del nivel y del tipo (para el conflicto jerárquico)
  ├── autoridad emisora, diario oficial, fecha de firma, fecha de publicación
  └── Estructura (árbol)
       libro → título → capítulo → sección → artículo → apartado → letra → ordinal
         └── Precepto  ← UNIDAD DE INDEXACIÓN Y DE CITACIÓN
              └── Redacción (1..N, versionado temporal)
-                  └── Manifestación lingüística (1..N, todas auténticas en la UE)
+                  └── Manifestación lingüística (1..N)
 ```
+
+**Los niveles y la tipología son datos, no enumeraciones del código** (ADR-0013).
+Se declaran en un **perfil de jurisdicción** (`config/jurisdicciones/*.toml`) que
+fija sus niveles, su tipología de instrumentos, su orden de rango, su esquema de
+identificador, su estilo de cita y el valor de la jurisprudencia. El perfil de la
+Fase 1 es **España + UE**:
+
+- Nivel supranacional: tratados, reglamentos UE, directivas, decisiones,
+  reglamentos delegados y de ejecución, *soft law* de autoridades europeas
+  (directrices EBA/ESMA/EIOPA, dictámenes EDPB).
+- Nivel nacional: Constitución, leyes orgánicas, leyes ordinarias, reales
+  decretos-ley, reales decretos legislativos, reales decretos, órdenes
+  ministeriales, circulares de supervisores.
+- Nivel autonómico y local, cuando aplique.
+- Relación de **transposición** bidireccional entre Directiva y normas nacionales.
+
+Cablear esa lista en un `enum` de TypeScript o en un `check` de Postgres
+obligaría a migrar el esquema para dar de alta cada nueva jurisdicción. Con
+ampliación a Iberoamérica prevista, eso no es aceptable.
 
 Y, junto a ellas:
 
@@ -216,14 +233,18 @@ Y, junto a ellas:
   ámbito (total / parcial) y, cuando se conozca, a nivel de **precepto**, no sólo
   de instrumento. La relación de **transposición** es bidireccional y navegable:
   de Directiva a normas nacionales de transposición y viceversa.
-- **Resoluciones judiciales** como **fuente interpretativa**, nunca primaria
-  vinculante (ADR-0007). Atributos:
-  - `valor_interpretativo`: `doctrina_consolidada` | `sentencia_aislada` |
+- **Resoluciones judiciales** con el valor que le atribuya **el perfil de su
+  jurisdicción** (ADR-0007). En España y en la UE, valor **interpretativo**,
+  nunca fuente primaria vinculante. Atributos:
+  - `valor_interpretativo`: catálogo declarado en el perfil de jurisdicción. Para
+    España + UE: `doctrina_consolidada` | `sentencia_aislada` |
     `supranacional_tjue` | `supranacional_tedh` | `constitucional`;
-  - `organo`, `sala`, `numero/año`, `fecha`, `ponente`, `firmeza`, `ECLI`;
+  - `organo`, `sala`, `numero/año`, `fecha`, `ponente`, `firmeza`, identificador
+    canónico (ECLI en la UE);
   - citas salientes a preceptos (con la redacción concreta aplicada).
-  **No se importa lógica de *stare decisis*.** No hay campos `binding`,
-  `overruled`, `distinguished` ni jerarquía de vinculación entre tribunales.
+  **No se importa lógica de *stare decisis*** del *common law*: no hay campos
+  `binding`, `overruled` ni `distinguished`, ni jerarquía de vinculación entre
+  tribunales cableada en el sistema.
 - **Soft law** (directrices EBA/ESMA/EIOPA, dictámenes EDPB, circulares de
   supervisores) como fuente interpretativa administrativa, con autoridad emisora
   y declaración expresa de su carácter no vinculante.
@@ -303,21 +324,25 @@ Recuperación híbrida a nivel de precepto:
 
 ## 5. Identificadores, formatos y multilingüismo (Requisito 2.3)
 
+El identificador canónico interno es un **URI propio de GNEO**
+(`gneo:<jurisdiccion>:<tipo>:<...>`) del que **ELI y ECLI son el caso particular
+de la UE y España**. Los identificadores nativos de cada proveedor (CELEX,
+BOE-A-AAAA-NNNNN, ROJ, número de asunto) se almacenan como alias resolubles. La
+razón es la ampliación prevista a Iberoamérica: allí no existe un equivalente
+universal de ELI, y un modelo que hiciera de ELI la clave primaria obligaría a
+rehacer el esquema (ADR-0013).
+
 | Elemento | Decisión | Estado de verificación |
 | --- | --- | --- |
-| Identificador canónico de norma | **ELI** (European Legislation Identifier) | Adoptado. `[PENDIENTE DE VERIFICACIÓN: referencia exacta de las Conclusiones del Consejo en el DOUE serie C que establecen el ELI, antes de citarlas en documentación o en la interfaz]` |
-| Identificador canónico de resolución judicial | **ECLI** (European Case Law Identifier) | Adoptado. `[PENDIENTE DE VERIFICACIÓN: referencia exacta de las Conclusiones del Consejo en el DOUE serie C que establecen el ECLI]` |
+| Identificador canónico de norma en la UE y España | **ELI** (European Legislation Identifier) | Adoptado. `[PENDIENTE DE VERIFICACIÓN: referencia exacta de las Conclusiones del Consejo en el DOUE serie C que establecen el ELI, antes de citarlas en documentación o en la interfaz]` |
+| Identificador canónico de resolución judicial en la UE y España | **ECLI** (European Case Law Identifier) | Adoptado. `[PENDIENTE DE VERIFICACIÓN: referencia exacta de las Conclusiones del Consejo en el DOUE serie C que establecen el ECLI]` |
 | Formato de intercambio | **Akoma Ntoso** | `[PENDIENTE DE VERIFICACIÓN: versión de la especificación OASIS a la que nos ajustamos]` |
 | Formato nativo EUR-Lex | **Formex** | `[PENDIENTE DE VERIFICACIÓN: versión vigente del esquema y su documentación oficial]` |
 | Formato nativo BOE | **XML del BOE** (legislación consolidada y sumarios) | `[PENDIENTE DE VERIFICACIÓN: esquema y condiciones de uso del servicio de datos abiertos del BOE]` |
 
-Regla: **ELI y ECLI son los identificadores internos**. Los identificadores
-nativos de cada proveedor (CELEX, BOE-A-AAAA-NNNNN, ROJ, número de asunto) se
-almacenan como alias resolubles, no como clave.
-
-**Multilingüismo.** El precepto es una entidad con **N manifestaciones
-lingüísticas enlazadas**, todas marcadas como auténticas cuando lo son (caso de
-las normas de la UE). Consecuencias de diseño:
+**Multilingüismo del contenido normativo.** El precepto es una entidad con **N
+manifestaciones lingüísticas enlazadas**, marcadas como auténticas cuando lo son
+(caso de las normas de la UE). Consecuencias de diseño:
 
 - La comparación entre versiones lingüísticas es **una herramienta de trabajo del
   producto**, alineada precepto a precepto, no un extra: es un método
@@ -325,6 +350,14 @@ las normas de la UE). Consecuencias de diseño:
 - El índice de recuperación es por manifestación, con retorno al precepto.
 - El pipeline de literalidad compara contra la manifestación en el idioma en el
   que se cita.
+
+**Idioma de la interfaz (decisión de SGF, 2026-09-09).** La UI y los prompts se
+desarrollan en **es-ES** como idioma principal, con **paquetes de idioma
+intercambiables** desde el primer día (ADR-0013). Son dos ejes distintos y no
+deben confundirse: el idioma de la interfaz, el idioma de los prompts y el idioma
+de la manifestación normativa recuperada se eligen por separado. Un abogado
+español consultando una norma UE puede querer la interfaz en español y comparar
+las versiones española y francesa del mismo precepto.
 
 ---
 
@@ -439,9 +472,11 @@ verificado_en = "AAAA-MM-DD"
 
 ### 7.4 Orden de implementación
 
-**Fase A — fuentes abiertas.** EUR-Lex, DOUE, CURIA, BOE (datos abiertos y
-legislación consolidada), boletines autonómicos, portales de supervisores (CNMV,
-Banco de España, AEPD, CNMC, EBA, ESMA).
+**Fase A — fuentes abiertas de España y la UE** (alcance jurisdiccional de la
+Fase 1, decisión de SGF de 2026-09-09). EUR-Lex, DOUE, CURIA, BOE (datos abiertos
+y legislación consolidada), boletines autonómicos, portales de supervisores (CNMV,
+Banco de España, AEPD, CNMC, EBA, ESMA). El orden concreto dentro de esta lista
+queda pendiente (Q-16).
 
 > Marco de reutilización, verificado en fuente oficial en lo que sigue:
 > - **Reutilización de información del sector público en España**: Ley 37/2007,
@@ -618,18 +653,26 @@ Clasificación por expediente y por documento:
 | Clase | Criterio | Enrutado |
 | --- | --- | --- |
 | `secreto_profesional` | Amparado por el secreto profesional del abogado | **Sólo modelo local** |
-| `rgpd_art_9` | Categorías especiales de datos (origen étnico o racial, opiniones políticas, convicciones religiosas o filosóficas, afiliación sindical, datos genéticos, biométricos de identificación unívoca, salud, vida u orientación sexual) — art. 9.1 RGPD, **verificado** | **Sólo modelo local** |
 | `rgpd_art_10` | Datos relativos a condenas e infracciones penales o medidas de seguridad conexas — art. 10 RGPD, **verificado** | **Sólo modelo local** |
+| `rgpd_art_9` | Categorías especiales del art. 9.1 RGPD, **verificado** (origen étnico o racial, opiniones políticas, convicciones religiosas o filosóficas, afiliación sindical, datos genéticos, biométricos de identificación unívoca, salud, vida u orientación sexual) | Clase **opcional, desactivada por defecto**; activable por tenant |
 | `ordinario` | Resto | Según configuración del tenant |
 
-> **Nota de precisión normativa.** El encargo menciona *"datos del art. 10 RGPD"*.
-> Verificado el texto oficial: el art. 10 RGPD regula los datos relativos a
-> **condenas e infracciones penales**, mientras que las **categorías especiales**
-> (salud, ideología, afiliación sindical, biometría…) están en el **art. 9**.
-> Para un despacho generalista **ambos** son pertinentes —el art. 10 en materia
-> penal, el art. 9 en laboral, familia, daños personales y protección de datos—,
-> por lo que el diseño cubre los dos y así lo refleja la tabla. Se somete a
-> confirmación de SGF por si la intención era restringir la regla al art. 10.
+> **Decisión de SGF, 2026-09-09:** la regla de modelo local obligatorio se limita
+> al **art. 10 RGPD** y al secreto profesional. El art. 9 queda como clase
+> disponible pero **no obligatoria**, activable por quien despliegue GNEO.
+>
+> **Precisión normativa, verificada sobre texto oficial:** el art. 10 RGPD regula
+> los datos relativos a **condenas e infracciones penales**; las **categorías
+> especiales** (salud, ideología, afiliación sindical, biometría, orientación
+> sexual) están en el **art. 9**. Consecuencia práctica de la decisión: un
+> expediente de laboral, familia o daños personales con datos de salud **no**
+> queda protegido por la regla obligatoria. Hoy el riesgo es teórico —los
+> proveedores externos están desactivados de fábrica y SGF opera sólo con modelo
+> local—, pero **se materializaría el día que se active un proveedor externo o
+> que un tercero despliegue GNEO con esa configuración**. Por eso la clase se
+> implementa y se deja a un interruptor de distancia, en vez de eliminarla.
+> Queda anotado aquí para que la decisión sea revisable con conocimiento de causa,
+> no para reabrirla.
 
 **Implementación del control:** la restricción se aplica en el **router de
 modelos**, sobre la unión de todos los documentos aportados al contexto de la
@@ -638,8 +681,9 @@ es una excepción que impide la llamada. Si no hay modelo local disponible y el
 contexto es sensible, **la operación falla** con un mensaje claro. Nunca hay
 recurso automático a un proveedor externo.
 
-Prueba de aceptación: un test que, con un documento marcado `rgpd_art_9`, verifica
-que el cliente de egreso **no recibe ninguna llamada**.
+Prueba de aceptación: un test que, con un documento marcado `rgpd_art_10`,
+verifica que el cliente de egreso **no recibe ninguna llamada**; y el mismo test
+para `rgpd_art_9` con la clase activada.
 
 ### 9.3 Registro por inferencia
 
@@ -717,12 +761,20 @@ en documentación si este tratamiento la exige.]`
 > general **desde el 2 de agosto de 2026**, con calendarios especiales por
 > capítulos; el capítulo IV, donde se ubica el art. 50, no figura entre las
 > excepciones.
-> **Cuestión abierta:** determinar si SGF actúa como *proveedor*, como
-> *responsable del despliegue*, o como ambos según el modo de despliegue —quien
-> distribuye el software a un despacho tercero y quien lo opera para sí no ocupan
-> la misma posición—. **Es una calificación jurídica que corresponde a SGF, no a
-> este documento** (§12, Q-08). El diseño implementa las obligaciones de ambos
-> roles por prudencia, incluido el marcado legible por máquina del apartado 2.
+> **Calificación (decisión de SGF, 2026-09-09): SGF actúa como *proveedor*.**
+> Es coherente con la orientación de GNEO a su distribución a terceros. El diseño
+> implementa en consecuencia, como obligaciones de primer orden, el apartado 1
+> (informar de que se interactúa con un sistema de IA) y el apartado 2 (**marcado
+> legible por máquina** del contenido sintético), además del apartado 5 (primera
+> interacción, requisitos de accesibilidad).
+>
+> Anotación, no objeción: mientras SGF utilice GNEO en su propio despacho ocupará
+> además, **respecto de ese uso**, la posición de responsable del despliegue. Las
+> obligaciones del apartado 4 que ello acarrea son de coste marginal nulo aquí
+> —ya se implementan la identificación de contenido generado por IA y la
+> advertencia de revisión profesional—, de modo que el diseño las cubre sin
+> ninguna decisión adicional. Si en el futuro un tercero opera GNEO, la posición
+> de responsable del despliegue será suya, no de SGF.
 
 ### 10.4 Retención, purga y mapa de propagación del borrado (ADR-0012)
 
@@ -785,12 +837,13 @@ Modelo de permisos con:
 | [ADR-0010](adr/0010-enrutado-de-modelos-por-sensibilidad.md) | Enrutado de modelos por sensibilidad como control técnico |
 | [ADR-0011](adr/0011-auditoria-encadenada-y-firmada.md) | Auditoría encadenada por hash y firmada |
 | [ADR-0012](adr/0012-purga-real-y-crypto-shredding.md) | Purga real con mapa de propagación y *crypto-shredding* |
+| [ADR-0013](adr/0013-agnosticismo-jurisdiccional-e-i18n.md) | Agnosticismo jurisdiccional y paquetes de idioma desde el primer día |
 
 ---
 
 ## 12. Decisiones que requieren pronunciamiento de SGF
 
-Las de licencia (Q-01 a Q-06) están en `00-licencia-agpl.md`, §7. Además:
+Las de licencia (Q-01 a Q-06) están también en `00-licencia-agpl.md`, §7. Además:
 
 ### 12.1 Resueltas por SGF el 2026-09-08
 
@@ -801,16 +854,26 @@ Las de licencia (Q-01 a Q-06) están en `00-licencia-agpl.md`, §7. Además:
 | Q-11 | Corpus vacío en `local-only` | **Negarse y declarar la laguna.** El sistema no elabora contenido normativo sin corpus que lo sostenga. Véase §8.1 y ADR-0009 |
 | Q-13 | Repositorio del fork | **Fase 0 en `sangut1/SG_website`; el código, en repositorio nuevo** al aprobar la Fase 1 |
 
-### 12.2 Pendientes
+### 12.2 Resueltas por SGF el 2026-09-09
+
+| # | Cuestión | Decisión |
+| --- | --- | --- |
+| Q-01 | Nombre del fork | **GNEO** (provisional) |
+| Q-03 | Distribución | **Orientado a distribución a terceros**, aunque en la Fase 1 sólo lo utilice SGF. Ganan peso las secs. 4, 5 y 6 AGPL además de la 13 |
+| Q-06 | Renombrado del contexto de firma | **Aceptado** romper la verificación de manifiestos anteriores |
+| Q-08 | Rol a efectos del Reglamento (UE) 2024/1689 | **Proveedor.** Véase §10.3 |
+| Q-09 | Alcance de la regla de modelo local | **Sólo art. 10 RGPD** y secreto profesional. El art. 9 queda como clase opcional desactivada. Véase §9.2 |
+| Q-12 | Alcance jurisdiccional | **España** en la Fase 1, con **ampliación prevista a Iberoamérica**. UI en es-ES con paquetes de idioma intercambiables. Véase §3, §5 y ADR-0013 |
+| Q-15 | Complemento de Word | **Se mantiene** en la Fase 1 |
+
+### 12.3 Pendientes
 
 | # | Cuestión | Por qué no la decido yo |
 | --- | --- | --- |
-| Q-08 | Calificación de SGF como *proveedor* y/o *responsable del despliegue* a efectos del Reglamento (UE) 2024/1689 | Calificación jurídica con consecuencias de cumplimiento. Corresponde a SGF |
-| Q-09 | ¿La regla de modelo local se limita al art. 10 RGPD o cubre también el art. 9? Propuesta: ambos | Decisión de política de riesgo del despacho |
 | Q-10 | Política por defecto de citas no resueltas: `marcar` o `suprimir` | Decisión de producto con efectos de responsabilidad profesional |
-| Q-12 | Alcance jurisdiccional de la Fase 1: ¿España + UE? ¿Qué comunidades autónomas y qué supervisores entran primero? | Determina el orden de los conectores de Fase A |
 | Q-14 | Corpus etiquetado de escritos reales para validar el parser de citas (§6.2) | Requiere material de SGF y **no puede vivir en el árbol AGPL** |
-| Q-15 | ¿Se mantiene el complemento de Word en la Fase 1? Arrastra dependencias de fuentes remotas y una superficie de despliegue adicional | Decisión de alcance de producto |
+| Q-16 | Dentro de España: ¿qué comunidades autónomas y qué supervisores entran primero en la Fase A? | Determina el orden de los conectores |
+| Q-17 | ¿Qué países de Iberoamérica se contemplan primero, y en qué horizonte? | Determina si el perfil de jurisdicción debe soportar precedente vinculante ya en la Fase 1 o basta con dejar la puerta abierta (ADR-0013) |
 
 ---
 

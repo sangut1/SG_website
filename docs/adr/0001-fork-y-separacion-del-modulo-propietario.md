@@ -14,9 +14,11 @@ revisión, playbooks y prompts de valor competitivo.
 
 ## Decisión
 
-1. El fork se mantiene como **monorepo único bajo AGPL-3.0**, conservando la
-   estructura `backend/` · `frontend/` · `word-addin/` y el historial de git. El
-   código vive en un **repositorio nuevo y dedicado**, no en el del sitio web.
+1. El fork —**GNEO**, nombre provisional fijado por SGF el 2026-09-09— se mantiene
+   como **monorepo único bajo AGPL-3.0**, conservando la estructura `backend/` ·
+   `frontend/` · `word-addin/` (el complemento de Word se mantiene en la Fase 1) y
+   el historial de git. El código vive en un **repositorio nuevo y dedicado**, no
+   en el del sitio web.
 2. **El *know-how* de SGF no se incorpora al programa en ninguna forma.** Es
    **contenido**, y entra en el sistema por las mismas rutas que un documento de
    cliente: subida de documentos, filas de base de datos y configuración del
@@ -65,6 +67,10 @@ documentos que se procesan con él. Esta vía **no tiene zona gris**.
   sin matices ante cualquier reclamación de cumplimiento.
 - SGF puede afirmar que su acervo documental no está sujeto a la AGPL. Lo que
   **no** puede afirmar es que la plataforma contenga funcionalidad propietaria.
+- Con la decisión de **distribuir GNEO a terceros** (2026-09-09), las secs. 4, 5 y
+  6 AGPL se activan de pleno además de la 13: cada imagen, instalador o copia
+  entregada es un acto de distribución. Los entregables de cumplimiento
+  (`00-licencia-agpl.md` §8) pasan a ser condición previa a la primera entrega.
 
 ## Verificación
 

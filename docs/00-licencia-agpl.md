@@ -1,7 +1,8 @@
-# 00 — Análisis de cumplimiento AGPL-3.0
+# 00 — Análisis de cumplimiento AGPL-3.0 (GNEO)
 
 **Estado:** borrador para aprobación (Fase 0).
-**Fecha:** 2026-09-08.
+**Fecha:** 2026-09-08, revisado el 2026-09-09.
+**Nombre provisional del fork:** **GNEO** (decisión de SGF, 2026-09-09).
 **Autor:** equipo de arquitectura del fork.
 **Destinatario:** Santos Gutiérrez Figueroa (en adelante, **SGF**).
 
@@ -35,6 +36,15 @@ El proyecto origen (`Open-Legal-Products/mike`, "MikeOSS") se distribuye bajo
 **GNU Affero General Public License v3.0**. El fork europeo hereda esa licencia
 en todo el código derivado. Esto no es negociable ni renunciable: la AGPL es la
 única vía por la que tenemos derecho a modificar y explotar ese código.
+
+**Escenario de explotación (decisión de SGF, 2026-09-09):** GNEO se orienta a
+**distribuirse a terceros**, aunque en la Fase 1 sólo lo utilice SGF. Esto no es
+un matiz: activa de pleno las secciones 4, 5 y 6 (distribución de copias, de
+versiones modificadas y de formas no fuente) **además** de la sección 13. Cada
+imagen de contenedor, cada instalador y cada copia entregada a un despacho es un
+acto de distribución con sus obligaciones. La consecuencia práctica es que los
+entregables del apartado 8 dejan de ser higiene y pasan a ser **condición previa
+a la primera entrega**.
 
 Magnitud de lo que se hereda (medido sobre el commit citado):
 
@@ -313,10 +323,10 @@ destacada de modificaciones y fechas de la sección 5 a).
 
 | # | Elemento | Ubicaciones detectadas | Acción |
 | --- | --- | --- | --- |
-| R-01 | Nombre de producto "Mike" / "MikeOSS" en textos visibles | 195 ficheros contienen la cadena; textos visibles concentrados en `frontend/src/app/layout.tsx`, `frontend/src/app/signup/page.tsx`, `frontend/src/app/support/page.tsx`, `word-addin/src/taskpane/auth/LoginPage.tsx`, `word-addin/src/taskpane/components/shell/ApiKeyBanner.tsx` | Sustituir por el nombre del fork (**pendiente de decidir**) |
+| R-01 | Nombre de producto "Mike" / "MikeOSS" en textos visibles | 195 ficheros contienen la cadena; textos visibles concentrados en `frontend/src/app/layout.tsx`, `frontend/src/app/signup/page.tsx`, `frontend/src/app/support/page.tsx`, `word-addin/src/taskpane/auth/LoginPage.tsx`, `word-addin/src/taskpane/components/shell/ApiKeyBanner.tsx` | Sustituir por **GNEO** |
 | R-02 | Logotipo e imagen de marca | `frontend/src/app/components/site-logo.tsx`, `docs/assets/link-image.jpg`, `docs/assets/mike-home.png`, `word-addin/assets/` | Eliminar y sustituir por identidad SGF |
-| R-03 | Dominio `mikeoss.com` | `README.md`, `word-addin/manifest.xml`, `word-addin/.env.example`, `word-addin/webpack.config.js`, `word-addin/scripts/dev.sh`, `docker-compose.yml`, `backend/supabase/config.toml` | Sustituir por dominio propio |
-| R-04 | Identificadores internos con la marca (`mike-backend:local`, bucket por defecto `mike`, tablas `mike_workflows` / `mike_workflow_assets`, `frontend/src/app/lib/mikeApi.ts`, contexto de firma `mike-project-manifest-v1`) | `docker-compose.yml:250,274`, `backend/src/lib/storage.ts`, `backend/schema.sql:1108,1167`, `backend/src/lib/manifestSigning.ts` | Renombrar. **Atención:** el cambio del contexto de firma y de los nombres de tabla exige migración y rompe la verificación de manifiestos anteriores; documentar en ADR y en la nota de versión |
+| R-03 | Dominio `mikeoss.com` | `README.md`, `word-addin/manifest.xml`, `word-addin/.env.example`, `word-addin/webpack.config.js`, `word-addin/scripts/dev.sh`, `docker-compose.yml`, `backend/supabase/config.toml` | Sustituir por el dominio de GNEO (pendiente de fijar) |
+| R-04 | Identificadores internos con la marca (`mike-backend:local`, bucket por defecto `mike`, tablas `mike_workflows` / `mike_workflow_assets`, `frontend/src/app/lib/mikeApi.ts`, contexto de firma `mike-project-manifest-v1`) | `docker-compose.yml:250,274`, `backend/src/lib/storage.ts`, `backend/schema.sql:1108,1167`, `backend/src/lib/manifestSigning.ts` | Renombrar a `gneo-*` (contexto de firma: `gneo-project-manifest-v1`). **SGF acepta expresamente (2026-09-09) que se rompa la verificación de los manifiestos emitidos con el contexto anterior.** Se hace ahora, antes de que exista ninguna exportación con valor probatorio, y se documenta en la nota de versión |
 | R-05 | Enlace al repositorio de *workflows* del origen | `frontend/src/app/components/workflows/OpenSourceWorkflowModal.tsx:20`, `backend/src/lib/workflowCatalogSource.ts` (`DEFAULT_REPOSITORY = "Open-Legal-Products/mike-workflows"`) | Sustituir por catálogo propio; véase también inventario I-14 |
 | R-06 | Política de seguridad y canales de contacto del origen | `SECURITY.md`, `CONTRIBUTING.md` | Reescribir con los canales de SGF |
 | R-07 | Manifiesto del complemento de Word (IDs, URLs, nombre visible) | `word-addin/manifest.xml` | Regenerar con identidad propia (GUID nuevo) |
@@ -419,19 +429,29 @@ revisión de licencia**, conforme a las convenciones de trabajo del proyecto.
 | Q-02 | Frontera con el *know-how* de SGF | **Contenido cargado por el operador.** El acervo de SGF no es software y queda fuera del árbol AGPL. Se descarta el módulo-servicio propietario. Véase §3 y ADR-0001 |
 | Q-13 | Dónde vive el repositorio del fork | **Fase 0 aquí (`sangut1/SG_website`), código en repositorio nuevo.** Estos documentos permanecen como memoria del proyecto; el fork se crea en un repositorio dedicado al aprobar la Fase 1 |
 
-### 7.2 Pendientes
+### 7.2 Resueltas por SGF el 2026-09-09
+
+| # | Cuestión | Decisión |
+| --- | --- | --- |
+| Q-01 | Nombre y marca del fork | **GNEO** (provisional). Dominio, pendiente de fijar |
+| Q-03 | Escenario de explotación | **Distribución a terceros**, aunque en la Fase 1 sólo lo use SGF. Activa de pleno las secs. 4, 5 y 6 además de la 13 |
+| Q-06 | Renombrado del contexto de firma (R-04) | **Aceptado** romper la verificación de manifiestos anteriores |
+
+### 7.3 Pendientes
 
 | # | Cuestión | Por qué no la resuelvo yo |
 | --- | --- | --- |
-| Q-01 | Nombre y marca del fork | Decisión comercial de SGF; condiciona R-01 a R-07 |
-| Q-03 | ¿Habrá distribución del software a terceros (instaladores, imágenes) o sólo despliegue operado por SGF? | Cambia el peso relativo de las secs. 4/5 frente a la sec. 13 |
-| Q-04 | ¿Se implementan Appropriate Legal Notices pese a la dispensa de la sec. 5 d)? | Propuesta: sí. Requiere confirmación |
+| Q-04 | ¿Se implementan Appropriate Legal Notices pese a la dispensa de la sec. 5 d)? | Propuesta: sí, y con la decisión de distribuir a terceros la propuesta se refuerza. Requiere confirmación |
 | Q-05 | Ámbito de la oferta de código de la sec. 13 en `local-only` monopuesto | Propuesta: ofrecerlo siempre. Requiere confirmación |
-| Q-06 | ¿Se acepta romper la verificación de manifiestos anteriores al renombrar el contexto de firma (R-04)? | Tiene efectos probatorios sobre exportaciones ya emitidas |
+| Q-18 | Dominio y titularidad de la marca "GNEO": ¿registro, disponibilidad, colisiones? | Decisión comercial y de propiedad industrial de SGF. Sin comprobar |
 
 ---
 
 ## 8. Entregables de cumplimiento a producir en la Fase 1
+
+Con la decisión de distribuir a terceros (Q-03), esta lista deja de ser higiene y
+pasa a ser **condición previa a la primera entrega de una copia**, en cualquier
+forma: imagen de contenedor, instalador, repositorio o acceso por red.
 
 - [ ] `NOTICE.md` (sec. 5 a) y atribución del origen)
 - [ ] `TRADEMARKS.md` (sec. 7 e))
