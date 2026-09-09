@@ -1,7 +1,7 @@
 # 00 — Análisis de cumplimiento AGPL-3.0 (GNEO)
 
-**Estado:** borrador para aprobación (Fase 0).
-**Fecha:** 2026-09-08, revisado el 2026-09-09.
+**Estado:** **APROBADO por SGF el 2026-09-09.** Fase 0 cerrada.
+**Fecha:** 2026-09-08; revisado y aprobado el 2026-09-09.
 **Nombre provisional del fork:** **GNEO** (decisión de SGF, 2026-09-09).
 **Autor:** equipo de arquitectura del fork.
 **Destinatario:** Santos Gutiérrez Figueroa (en adelante, **SGF**).
@@ -127,10 +127,13 @@ Texto verificado (condiciones a), b), c) y d)):
 > ausencia de garantía y acceso a la licencia (la única referencia externa
 > encontrada es un enlace al repositorio de *workflows* en
 > `frontend/src/app/components/workflows/OpenSourceWorkflowModal.tsx:20`).
-> **Decisión propuesta: implementarlos igualmente.** La excepción es una
+> **Decisión de SGF, 2026-09-09: se implementan igualmente.** La excepción es una
 > dispensa, no una prohibición, y el aviso es además el vehículo natural para
-> cumplir la sección 13 y el art. 50 del Reglamento (UE) 2024/1689.
-> *Confirmación requerida de SGF.*
+> cumplir la sección 13 y el art. 50 del Reglamento (UE) 2024/1689. Con GNEO
+> orientado a distribuirse a terceros, renunciar a la dispensa es además lo
+> prudente: el receptor de una copia debe poder ver de quién es el copyright,
+> que no hay garantía y dónde está la licencia, sin salir de la aplicación.
+> Véase ADR-0014.
 
 ### 2.3 Sección 7 — Términos adicionales
 
@@ -180,12 +183,13 @@ eso la sección 13 existe como obligación autónoma.
 
 | Modo | ¿Hay interacción remota por red? | Obligación |
 | --- | --- | --- |
-| `local-only` en una única máquina, sin servidor accesible por red | Discutible; en la práctica no hay "usuarios remotos" | Se ofrece igualmente el código fuente. Coste cero, riesgo cero. |
+| `local-only` en una única máquina, sin servidor accesible por red | Discutible; en la práctica no hay "usuarios remotos" | **Se ofrece igualmente** (decisión de SGF, 2026-09-09). Coste cero, riesgo cero, y evita tener que razonar caso a caso si un despliegue concreto ha dejado de ser monopuesto. |
 | `local-only` on-premise servido a los usuarios del despacho por LAN | **Sí** | Oferta obligatoria a todos esos usuarios. |
 | `nube-propietaria` | **Sí** | Oferta obligatoria. |
 | `hibrido` | **Sí** | Oferta obligatoria. |
 
-**Implementación propuesta (uniforme, sin depender del modo):**
+**Implementación (uniforme en todos los modos, decisión de SGF de 2026-09-09;
+ADR-0014):**
 
 1. Endpoint `GET /source` en el backend, que sirve el *Corresponding Source*
    exacto de la build en ejecución, sin autenticación y sin coste.
@@ -436,14 +440,16 @@ revisión de licencia**, conforme a las convenciones de trabajo del proyecto.
 | Q-01 | Nombre y marca del fork | **GNEO** (provisional). Dominio, pendiente de fijar |
 | Q-03 | Escenario de explotación | **Distribución a terceros**, aunque en la Fase 1 sólo lo use SGF. Activa de pleno las secs. 4, 5 y 6 además de la 13 |
 | Q-06 | Renombrado del contexto de firma (R-04) | **Aceptado** romper la verificación de manifiestos anteriores |
+| Q-04 | Appropriate Legal Notices pese a la dispensa de la sec. 5 d) | **Se implementan.** Véase §2.2 y ADR-0014 |
+| Q-05 | Oferta de código de la sec. 13 en `local-only` monopuesto | **Se ofrece siempre**, en todos los modos. Véase §2.4 y ADR-0014 |
 
-### 7.3 Pendientes
+**Con esto queda cerrada la Fase 0 en lo relativo a licencia.**
 
-| # | Cuestión | Por qué no la resuelvo yo |
+### 7.3 Pendiente, sin bloquear la Fase 1
+
+| # | Cuestión | Estado |
 | --- | --- | --- |
-| Q-04 | ¿Se implementan Appropriate Legal Notices pese a la dispensa de la sec. 5 d)? | Propuesta: sí, y con la decisión de distribuir a terceros la propuesta se refuerza. Requiere confirmación |
-| Q-05 | Ámbito de la oferta de código de la sec. 13 en `local-only` monopuesto | Propuesta: ofrecerlo siempre. Requiere confirmación |
-| Q-18 | Dominio y titularidad de la marca "GNEO": ¿registro, disponibilidad, colisiones? | Decisión comercial y de propiedad industrial de SGF. Sin comprobar |
+| Q-18 | Dominio y titularidad de la marca "GNEO": registro, disponibilidad, colisiones | Decisión comercial y de propiedad industrial de SGF. **No comprobado.** No bloquea el arranque: el nombre se usa como identificador interno y de repositorio; la comprobación debe hacerse antes de la primera entrega a un tercero y antes de fijar dominio |
 
 ---
 

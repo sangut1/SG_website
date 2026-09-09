@@ -7,8 +7,9 @@
 ## Contexto
 
 El alcance de la Fase 1 es **España** (con Derecho de la UE), pero SGF prevé
-ampliar GNEO **principalmente a países de Iberoamérica**, y quiere que la interfaz
-—desarrollada en `es-ES`— admita paquete de cambio de idioma.
+ampliar GNEO a Iberoamérica. Horizonte próximo fijado por SGF el 2026-09-09:
+**México, Colombia, Perú, Ecuador y Argentina.** La interfaz se desarrolla en
+`es-ES` y debe admitir paquete de cambio de idioma.
 
 Eso convierte tres decisiones que parecían cerradas en decisiones de diseño
 abiertas, y conviene verlas ahora y no cuando haya 51 tablas migradas:
@@ -20,12 +21,16 @@ abiertas, y conviene verlas ahora y no cuando haya 51 tablas migradas:
 2. **ELI y ECLI son europeos.** No hay equivalente universal en Iberoamérica.
 3. **El valor de la jurisprudencia no es el mismo en todo el Derecho
    continental.** El ADR-0007 excluye —con razón para España y la UE— la lógica de
-   *stare decisis* del *common law*. Pero varios ordenamientos iberoamericanos de
-   tradición continental atribuyen a determinadas resoluciones un **efecto
-   vinculante** por vía legal o constitucional. Un sistema que trate "jurisprudencia
-   = fuente interpretativa" como **constante del código** sería incorrecto allí.
-   `[PENDIENTE DE VERIFICACIÓN: régimen concreto de cada ordenamiento que se
-   incorpore, contra su fuente oficial, antes de escribir su perfil.]`
+   *stare decisis* del *common law*. Pero, **según la información disponible**,
+   varios de los cinco ordenamientos del horizonte atribuyen a determinadas
+   resoluciones un **efecto vinculante** por vía legal o constitucional. Un
+   sistema que trate "jurisprudencia = fuente interpretativa" como **constante del
+   código** sería incorrecto allí.
+   `[PENDIENTE DE VERIFICACIÓN: el régimen concreto de México, Colombia, Perú,
+   Ecuador y Argentina —qué órgano, qué tipo de resolución, con qué requisitos y
+   con qué efecto— debe contrastarse contra la fuente oficial de cada país antes
+   de escribir su perfil. No se ha verificado y no se reconstruye de memoria. En
+   el entorno de trabajo actual no hay acceso a esas fuentes.]`
 
 ## Decisión
 
@@ -101,9 +106,18 @@ abiertas, y conviene verlas ahora y no cuando haya 51 tablas migradas:
 - La suite `evals/` pasa a estar **particionada por jurisdicción**. La de la Fase 1
   es la española y de la UE; cada perfil nuevo trae la suya, y sin ella el perfil
   no se da por bueno.
-- Queda abierto **Q-17**: qué países de Iberoamérica y en qué horizonte. La
-  respuesta determina si hay que soportar precedente vinculante ya en la Fase 1 o
-  basta con dejar la puerta abierta, que es lo que hace este ADR.
+- Con el horizonte fijado (México, Colombia, Perú, Ecuador, Argentina), el
+  **modelo de la Fase 1 debe poder representar el efecto vinculante desde el
+  principio**, aunque el perfil `ES` no lo use y aunque no se implemente ningún
+  perfil iberoamericano en la Fase 1. Representarlo cuesta un campo y una regla
+  en el perfil; retroadaptarlo costaría reabrir el modelo de fuentes.
+  Concretamente, el catálogo de valores de la jurisprudencia admite un atributo
+  `efecto` ∈ { `interpretativo`, `vinculante_por_ley` }, con `interpretativo`
+  como único valor usado por el perfil `ES`/`EU`.
+- Cada perfil nuevo requiere, antes de escribirse: verificación de su régimen de
+  fuentes contra fuente oficial, su fichero de estilo de cita, su partición de la
+  suite `evals/` y el análisis de reutilización de sus fuentes públicas. Un perfil
+  sin esas cuatro cosas no se da por bueno.
 
 ## Verificación
 

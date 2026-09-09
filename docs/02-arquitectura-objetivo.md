@@ -1,10 +1,10 @@
 # 02 — Arquitectura objetivo de GNEO
 
-**Estado:** borrador para aprobación (Fase 0).
-**Fecha:** 2026-09-08, revisado el 2026-09-09.
+**Estado:** **APROBADO por SGF el 2026-09-09.** Fase 0 cerrada.
+**Fecha:** 2026-09-08; revisado y aprobado el 2026-09-09.
 **Nombre provisional del fork:** **GNEO** (decisión de SGF, 2026-09-09).
 **Documentos previos:** `00-licencia-agpl.md`, `01-inventario-us-centrico.md`.
-**Decisiones formalizadas:** `docs/adr/` (ADR-0001 a ADR-0013).
+**Decisiones formalizadas:** `docs/adr/` (ADR-0001 a ADR-0014).
 
 ---
 
@@ -239,6 +239,10 @@ Y, junto a ellas:
   - `valor_interpretativo`: catálogo declarado en el perfil de jurisdicción. Para
     España + UE: `doctrina_consolidada` | `sentencia_aislada` |
     `supranacional_tjue` | `supranacional_tedh` | `constitucional`;
+  - `efecto` ∈ { `interpretativo`, `vinculante_por_ley` }. El perfil `ES`/`EU`
+    usa **sólo** `interpretativo`. El campo existe desde la Fase 1 porque el
+    horizonte iberoamericano lo exigirá y retroadaptarlo obligaría a reabrir el
+    modelo de fuentes (ADR-0013);
   - `organo`, `sala`, `numero/año`, `fecha`, `ponente`, `firmeza`, identificador
     canónico (ECLI en la UE);
   - citas salientes a preceptos (con la redacción concreta aplicada).
@@ -573,8 +577,16 @@ renderizado
 
 **Ninguna cita se muestra al usuario sin resolución positiva.** Una cita no
 resuelta se marca de forma inequívoca como **NO VERIFICADA** o se suprime, según
-`politica_citas_no_resueltas` ∈ { `marcar`, `suprimir` }. **Nunca se presenta como
-verificada por defecto**, y no existe valor de configuración que lo permita.
+`politica_citas_no_resueltas` ∈ { `marcar`, `suprimir` }, **con `marcar` como valor
+por defecto** (decisión de SGF, 2026-09-09). **Nunca se presenta como verificada
+por defecto**, y no existe valor de configuración que lo permita.
+
+El motivo de preferir `marcar` a `suprimir`: una cita suprimida desaparece sin
+dejar rastro y el abogado no llega a saber que el sistema intentó apoyarse en
+algo que no pudo comprobar. Marcada, ve exactamente qué no se ha verificado y por
+qué, y decide. `suprimir` queda disponible para despliegues que prefieran no
+mostrar nunca una referencia sin comprobar. La consecuencia de esta elección es
+que **el marcado tiene que ser inequívoco de verdad**: véase §8.2.
 
 **Regla de corpus insuficiente (decisión de SGF, 2026-09-08).** Cuando **ninguna**
 cita de la respuesta puede resolverse contra fuente —caso típico de `local-only`
@@ -838,6 +850,7 @@ Modelo de permisos con:
 | [ADR-0011](adr/0011-auditoria-encadenada-y-firmada.md) | Auditoría encadenada por hash y firmada |
 | [ADR-0012](adr/0012-purga-real-y-crypto-shredding.md) | Purga real con mapa de propagación y *crypto-shredding* |
 | [ADR-0013](adr/0013-agnosticismo-jurisdiccional-e-i18n.md) | Agnosticismo jurisdiccional y paquetes de idioma desde el primer día |
+| [ADR-0014](adr/0014-avisos-legales-y-oferta-de-codigo.md) | Appropriate Legal Notices y oferta de código fuente en todos los modos |
 
 ---
 
@@ -865,15 +878,19 @@ Las de licencia (Q-01 a Q-06) están también en `00-licencia-agpl.md`, §7. Ade
 | Q-09 | Alcance de la regla de modelo local | **Sólo art. 10 RGPD** y secreto profesional. El art. 9 queda como clase opcional desactivada. Véase §9.2 |
 | Q-12 | Alcance jurisdiccional | **España** en la Fase 1, con **ampliación prevista a Iberoamérica**. UI en es-ES con paquetes de idioma intercambiables. Véase §3, §5 y ADR-0013 |
 | Q-15 | Complemento de Word | **Se mantiene** en la Fase 1 |
+| Q-04 | Appropriate Legal Notices | **Se implementan.** Véase ADR-0014 |
+| Q-05 | Oferta de código en `local-only` monopuesto | **Se ofrece siempre**, en todos los modos. Véase ADR-0014 |
+| Q-10 | Política por defecto de citas no resueltas | **`marcar`.** Véase §8.1 y ADR-0009 |
+| Q-17 | Países de Iberoamérica en el horizonte próximo | **México, Colombia, Perú, Ecuador y Argentina.** Véase ADR-0013 |
 
-### 12.3 Pendientes
+**Con esto queda cerrada la Fase 0.**
 
-| # | Cuestión | Por qué no la decido yo |
+### 12.3 Pendiente, sin bloquear la Fase 1
+
+| # | Cuestión | Estado |
 | --- | --- | --- |
-| Q-10 | Política por defecto de citas no resueltas: `marcar` o `suprimir` | Decisión de producto con efectos de responsabilidad profesional |
-| Q-14 | Corpus etiquetado de escritos reales para validar el parser de citas (§6.2) | Requiere material de SGF y **no puede vivir en el árbol AGPL** |
-| Q-16 | Dentro de España: ¿qué comunidades autónomas y qué supervisores entran primero en la Fase A? | Determina el orden de los conectores |
-| Q-17 | ¿Qué países de Iberoamérica se contemplan primero, y en qué horizonte? | Determina si el perfil de jurisdicción debe soportar precedente vinculante ya en la Fase 1 o basta con dejar la puerta abierta (ADR-0013) |
+| Q-14 | Corpus etiquetado de escritos reales para validar el parser de citas (§6.2) | Requiere material de SGF y **no puede vivir en el árbol AGPL**. Se necesita cuando el parser esté en construcción, no antes |
+| Q-16 | Dentro de España: qué comunidades autónomas y qué supervisores entran primero en la Fase A | Se decide al planificar la Fase A. El BOE y EUR-Lex van primero en cualquier orden |
 
 ---
 

@@ -47,11 +47,14 @@ apoyo jurídico (inventario I-05, I-15). El Requisito 2.1 exige lo contrario.
 - La distinción entre doctrina consolidada y sentencia aislada exige criterio
   editorial o metadatos de la fuente; cuando no consten, se marca como
   **desconocido** y no se presume consolidada.
-- Con la ampliación prevista a Iberoamérica (ADR-0013), el catálogo de valores de
-  la jurisprudencia deja de ser una lista fija y pasa a declararse por perfil. El
-  régimen concreto de cada ordenamiento que se incorpore queda
-  `[PENDIENTE DE VERIFICACIÓN]` contra su fuente oficial antes de escribir su
-  perfil.
+- Con el horizonte iberoamericano fijado —México, Colombia, Perú, Ecuador y
+  Argentina (ADR-0013)—, el catálogo de valores de la jurisprudencia deja de ser
+  una lista fija y pasa a declararse por perfil, con un atributo `efecto` ∈
+  { `interpretativo`, `vinculante_por_ley` }. **El perfil `ES`/`EU` usa sólo
+  `interpretativo`**; el campo existe desde la Fase 1 para no tener que reabrir el
+  modelo de fuentes después. El régimen concreto de cada ordenamiento que se
+  incorpore queda `[PENDIENTE DE VERIFICACIÓN]` contra su fuente oficial antes de
+  escribir su perfil.
 
 ## Verificación
 

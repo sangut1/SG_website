@@ -1,7 +1,7 @@
 # 01 — Inventario de componentes con supuestos de Derecho anglosajón
 
-**Estado:** borrador para aprobación (Fase 0).
-**Fecha:** 2026-09-08, revisado el 2026-09-09.
+**Estado:** **APROBADO por SGF el 2026-09-09.** Fase 0 cerrada.
+**Fecha:** 2026-09-08; revisado y aprobado el 2026-09-09.
 **Fork:** **GNEO** (nombre provisional).
 **Base analizada:** `Open-Legal-Products/mike`, commit
 `8b3466fc04bf8cad623238a71fca1fda3fc89fde` (2026-09-05), clonado y leído

@@ -22,8 +22,14 @@ literalidad de la cita contra el texto de origen con tres niveles de tolerancia
    renderizado.
 2. **Ninguna cita se muestra sin resolución positiva.** Una cita no resuelta se
    marca **NO VERIFICADA** de forma inequívoca o se suprime, según
-   `politica_citas_no_resueltas` ∈ { `marcar`, `suprimir` }. **No existe valor de
-   configuración que la presente como verificada.**
+   `politica_citas_no_resueltas` ∈ { `marcar`, `suprimir` }, **con `marcar` por
+   defecto** (decisión de SGF, 2026-09-09). **No existe valor de configuración que
+   la presente como verificada.**
+   Razón de la preferencia: una cita suprimida desaparece sin dejar rastro y el
+   abogado no llega a saber que el sistema intentó apoyarse en algo que no pudo
+   comprobar. Marcada, ve qué no se ha verificado y por qué, y decide.
+   `suprimir` queda disponible para despliegues que prefieran no mostrar nunca una
+   referencia sin comprobar.
 3. Toda afirmación jurídica enlaza al fragmento que la sostiene. Sin anclaje se
    marca como **razonamiento del modelo**, no como contenido normativo.
 4. Se elimina del prompt la autorización a responder de memoria y se sustituye por
@@ -74,5 +80,9 @@ literalidad de la cita contra el texto de origen con tres niveles de tolerancia
 
 - La propia suite `evals/` es el criterio de aceptación del producto.
 - Gate de CI que falla al superar los umbrales.
+- Con `marcar` por defecto, el marcado pasa a ser parte del criterio de
+  aceptación: prueba de interfaz que verifica que los tres estados (verificada,
+  verificada con advertencia, no verificada) son distinguibles **sin depender del
+  color**, y que el estado "no verificada" indica la razón.
 - Test con corpus vacío que comprueba que el sistema declara la laguna y **no**
   produce contenido normativo.
