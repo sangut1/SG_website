@@ -5,8 +5,12 @@ Derecho anglosajón al Derecho continental.
 
 > **Fase 0 APROBADA por SGF el 2026-09-09.** Análisis previo cerrado. Ningún
 > fichero de aplicación ha sido escrito ni modificado en esta fase. El código de
-> GNEO se desarrolla en un repositorio nuevo y dedicado; estos documentos
-> permanecen aquí como memoria del proyecto.
+> GNEO se desarrolla en `sangut1/gneo` (privado); estos documentos permanecen
+> aquí como memoria del proyecto.
+>
+> **Fase 1 bloqueada** a la espera de que exista `sangut1/gneo`: el integrador de
+> GitHub de la sesión no tiene permiso para crear repositorios. Véase
+> [`fase-1/00-procedimiento-de-siembra.md`](fase-1/00-procedimiento-de-siembra.md).
 
 | Documento | Contenido |
 | --- | --- |
@@ -14,6 +18,7 @@ Derecho anglosajón al Derecho continental.
 | [01 — Inventario US-céntrico](01-inventario-us-centrico.md) | 51 hallazgos con evidencia por fichero y línea, marcados como sustituir / abstraer / eliminar / conservar, más 13 de soberanía del dato |
 | [02 — Arquitectura objetivo](02-arquitectura-objetivo.md) | Arquitectura de GNEO con diagrama, decisiones justificadas y consecuencias declaradas |
 | [ADR](adr/) | Un registro por decisión arquitectónica relevante (ADR-0001 a ADR-0014) |
+| [Fase 1 — arranque](fase-1/) | Procedimiento de siembra del repositorio GNEO y borradores de los ficheros de gobernanza (`NOTICE.md`, `TRADEMARKS.md`, `AGENTS.md`, `CLAUDE.md`) |
 
 ## Decisiones de SGF
 
