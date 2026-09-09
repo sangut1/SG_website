@@ -8,9 +8,9 @@ Derecho anglosajón al Derecho continental.
 > GNEO se desarrolla en `sangut1/gneo` (privado); estos documentos permanecen
 > aquí como memoria del proyecto.
 >
-> **Fase 1 bloqueada** a la espera de que exista `sangut1/gneo`: el integrador de
-> GitHub de la sesión no tiene permiso para crear repositorios. Véase
-> [`fase-1/00-procedimiento-de-siembra.md`](fase-1/00-procedimiento-de-siembra.md).
+> **Fase 1 en marcha.** `sangut1/gneo` sembrado el 2026-09-09 con los 631 commits
+> del historial del proyecto de origen (`main` en `8b3466f`). El bloque 1
+> —gobernanza y cumplimiento AGPL— está en la rama `fase-1/gobernanza`.
 
 | Documento | Contenido |
 | --- | --- |

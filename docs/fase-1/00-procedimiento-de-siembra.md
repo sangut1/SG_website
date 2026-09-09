@@ -1,23 +1,18 @@
 # Procedimiento de siembra del repositorio GNEO
 
-**Estado:** listo para ejecutar. **Bloqueado** a la espera de que exista el
-repositorio.
+**Estado:** **EJECUTADO el 2026-09-09.** Se conserva como registro de cómo se
+sembró GNEO y de por qué se hizo así.
+
+- `sangut1/gneo`, privado, creado por SGF (el integrador de GitHub de la sesión
+  no puede crear repositorios: `403 Resource not accessible by integration`).
+- `main` sembrado con los **631 commits** del historial del proyecto de origen.
+  `HEAD` = `8b3466fc04bf8cad623238a71fca1fda3fc89fde`, verificado contra el
+  remoto.
+- Bloque 1 (gobernanza) en la rama `fase-1/gobernanza`, commit `75da43e`.
 
 ---
 
-## Bloqueo actual
-
-El integrador de GitHub de esta sesión **no tiene permiso para crear
-repositorios**:
-
-```
-POST https://api.github.com/user/repos
-403 Resource not accessible by integration
-```
-
-El repositorio debe crearlo SGF a mano.
-
-## Lo que hay que crear
+## Lo que hubo que crear
 
 - **Nombre:** `sangut1/gneo`
 - **Visibilidad:** **privado**
@@ -52,7 +47,7 @@ Primer commit del historial heredado: `65739ef1ce39a1ba9f13602c0ac57c6d72f495e3`
 Conservar `upstream` permite seguir las correcciones de seguridad del proyecto de
 origen. **No implica** sincronización automática: cada incorporación se revisa.
 
-## Primer commit propio de GNEO
+## Primer commit propio de GNEO — **hecho** (`75da43e`)
 
 Sobre `main`, rama `fase-1/gobernanza`:
 
@@ -79,7 +74,7 @@ Sobre `main`, rama `fase-1/gobernanza`:
 
 | # | Bloque | Depende de |
 | --- | --- | --- |
-| 1 | Gobernanza: `NOTICE.md`, `TRADEMARKS.md`, `AGENTS.md`, `CLAUDE.md`, `docs/`, `CODEOWNERS` | siembra |
+| 1 | ✅ **Hecho** — Gobernanza: `NOTICE.md`, `TRADEMARKS.md`, `AGENTS.md`, `CLAUDE.md`, `docs/`, `CODEOWNERS` | siembra |
 | 2 | *Gates* de CI: `knowhow-gate`, `gitleaks` ampliado, gate de egreso (`fetch` fuera de `egress.ts`), gate de literales de UI | 1 |
 | 3 | Soberanía mínima: hallazgos S-01 a S-05 (fuentes de Google, CDN de PDF.js, catálogo de *workflows* desde GitHub). **Sin esto la prueba de red aislada no arranca** | 2 |
 | 4 | Cliente de egreso único + lista blanca + `SOVEREIGNTY_MODE` + suite `airgap` | 3 |
